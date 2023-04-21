@@ -57,3 +57,8 @@ dkms.conf
 /vs/x64
 /vs/*.user
 /.vscode
+
+# build
+/build
+/*.egg-info
+/dist
