@@ -22,11 +22,11 @@ static void Date_dealloc(PyObject* self);                                       
 
 static PyObject* Date_new(PyTypeObject* type, PyObject* args, PyObject* kwds);  // __new__ method
 
-int Date_init(PyObject* self, PyObject* args, PyObject* kwds);                  // __init__ method
+static int Date_init(PyObject* self, PyObject* args, PyObject* kwds);                  // __init__ method
 
 static PyObject* Date_repr(PyObject* self);                                     // __repr__ method
 
-PyObject* Date_richcompare(PyObject* self, PyObject* other, int op);            // __lt__, __le__, __eq__, __ne__, __gt__, __ge__ methods
+static PyObject* Date_richcompare(PyObject* self, PyObject* other, int op);            // __lt__, __le__, __eq__, __ne__, __gt__, __ge__ methods
 
 #ifdef __cplusplus
 }
