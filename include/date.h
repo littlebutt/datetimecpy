@@ -9,24 +9,48 @@ extern "C" {
 #include <Python.h>
 #include "structmember.h"
 
+#include <time.h>
+
 static PyTypeObject Date_type;
 
 typedef struct {
     PyObject_HEAD
 
-    char* timestamp;
+    long long timestamp;
 
 } Date;
 
-static void Date_dealloc(PyObject* self);                                       // destruction method
+void Date_dealloc(PyObject* self);                                       // destruction method
 
-static PyObject* Date_new(PyTypeObject* type, PyObject* args, PyObject* kwds);  // __new__ method
+PyObject* Date_new(PyTypeObject* type, PyObject* args, PyObject* kwds);  // __new__ method
 
-static int Date_init(PyObject* self, PyObject* args, PyObject* kwds);                  // __init__ method
+int Date_init(PyObject* self, PyObject* args, PyObject* kwds);           // __init__ method
 
-static PyObject* Date_repr(PyObject* self);                                     // __repr__ method
+PyObject* Date_repr(PyObject* self);                                     // __repr__ method
 
-static PyObject* Date_richcompare(PyObject* self, PyObject* other, int op);            // __lt__, __le__, __eq__, __ne__, __gt__, __ge__ methods
+PyObject* Date_richcompare(PyObject* self, PyObject* other, int op);     // __lt__, __le__, __eq__, __ne__, __gt__, __ge__ methods
+
+
+PyDoc_STRVAR(doc_date, 
+"Date\n-\n\n\
+The Date implementation for datetimecpy");
+
+static PyTypeObject Date_type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "datetimecpy.date",
+    .tp_basicsize = sizeof(Date),
+    .tp_dealloc = (destructor) Date_dealloc,
+    .tp_repr = (reprfunc) Date_repr,
+    .tp_str = (reprfunc) Date_repr,
+    .tp_getattro = (getattrofunc) PyObject_GenericGetAttr,
+    .tp_setattro = (setattrofunc) PyObject_GenericSetAttr,
+    .tp_flags = (Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE),
+    .tp_doc = doc_date,
+    .tp_init = Date_init,
+    .tp_new = Date_new,
+    .tp_richcompare = (richcmpfunc)Date_richcompare,
+    .tp_free = PyObject_Del
+};
 
 #ifdef __cplusplus
 }

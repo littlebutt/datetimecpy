@@ -124,6 +124,7 @@
     <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import datetimecpy'); import datetimecpy"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PYTHONPATH=$(OutDir)</LocalDebuggerEnvironment>
     <DebuggerFlavor>$(DefaultDebuggerFlavor)</DebuggerFlavor>
+    <SourcePath>C:\Users\luoga\source\repos\datetimecpy\datetimecpy\objects;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -191,6 +192,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\datetimecpy.c" />
+    <ClCompile Include="..\objects\date.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\date.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

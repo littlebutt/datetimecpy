@@ -2,6 +2,7 @@
 #include <Python.h>
 
 #include <time.h>
+#include "include/date.h"
 
 PyObject*
 datetimecpy_now(PyObject* self, PyObject* Py_UNUSED(args)) {
@@ -34,6 +35,9 @@ static PyModuleDef datetimecpy_def = {
 };
 
 PyMODINIT_FUNC PyInit_datetimecpy() {
+    if (PyType_Ready(&Date_type) < 0) {
+        return NULL;
+    }
     PyObject* m = PyModule_Create(&datetimecpy_def);
     if (!m)
     {
@@ -41,5 +45,12 @@ PyMODINIT_FUNC PyInit_datetimecpy() {
     }
     PyModule_AddStringConstant(m, "__author__", "littlebutt");
     PyModule_AddStringConstant(m, "__version__", "1.0.0");
+    Py_INCREF(&Date_type);
+    if (PyModule_AddObject(m, "date", (PyObject*)&Date_type) < 0)
+    {
+        Py_DECREF(&Date_type);
+        Py_DECREF(m);
+        return NULL;
+    }
     return m;
 }

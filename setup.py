@@ -1,7 +1,7 @@
 from setuptools import setup, Extension
 
 module1 = Extension('datetimecpy',
-                    sources = ['datetimecpy.c'])
+                    sources = ['datetimecpy.c', 'objects/date.c'])
 
 setup (name='datetimecpy',
        version='1.0',
