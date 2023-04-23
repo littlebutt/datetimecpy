@@ -4,22 +4,6 @@
 #include <time.h>
 #include "include/date.h"
 
-PyObject*
-datetimecpy_now(PyObject* self, PyObject* Py_UNUSED(args)) {
-    time_t now = time(NULL);
-
-    if (now < 0) {
-        Py_RETURN_NONE;
-    } else {
-        return PyLong_FromLongLong((long long)now);
-    }
-}
-
-static PyMethodDef datetimecpy_functions[] = {
-    { "now", (PyCFunction)datetimecpy_now, METH_NOARGS, PyDoc_STR("now\n-\n\nQuery the current timestamp from the os.") },
-    { NULL, NULL, 0, NULL }
-};
-
 PyDoc_STRVAR(datetimecpy_doc, "The datetimecpy module");
 
 static PyModuleDef datetimecpy_def = {
@@ -27,7 +11,7 @@ static PyModuleDef datetimecpy_def = {
     "datetimecpy",
     datetimecpy_doc,
     -1,                                 /* m_size */
-    datetimecpy_functions,              /* m_methods */
+    NULL,                               /* m_methods */
     NULL,                               /* m_slots */
     NULL,                               /* m_traverse */
     NULL,                               /* m_clear */

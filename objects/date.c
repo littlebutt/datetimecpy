@@ -30,3 +30,19 @@ PyObject* Date_richcompare(PyObject* self, PyObject* other, int op) {
         long long diff = ((Date*)self)->timestamp - ((Date*)other)->timestamp;
         Py_RETURN_RICHCOMPARE(diff, 0, op);
 }
+
+PyObject* Date_today(PyObject* self, PyObject* Py_UNUSED(args)) {
+    Date* retval = PyObject_New(Date, &Date_type);
+    if (!retval) {
+        return NULL;
+    }
+    time_t now = time(NULL);
+    retval->timestamp = (long long)now;
+    return retval;
+}
+
+PyObject* Date_totimestamp(PyObject* self, PyObject* Py_UNUSED(args)) {
+    long long _timestamp = ((Date*)self)->timestamp;
+    return PyLong_FromLongLong(_timestamp);
+}
+

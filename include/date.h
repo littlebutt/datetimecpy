@@ -30,6 +30,15 @@ PyObject* Date_repr(PyObject* self);                                     // __re
 
 PyObject* Date_richcompare(PyObject* self, PyObject* other, int op);     // __lt__, __le__, __eq__, __ne__, __gt__, __ge__ methods
 
+PyObject* Date_today(PyObject* self, PyObject* Py_UNUSED(args));
+
+PyObject* Date_totimestamp(PyObject* self, PyObject* Py_UNUSED(args));
+
+static PyMethodDef date_methods[] = {
+    {"today", Date_today, METH_NOARGS | METH_CLASS, PyDoc_STR("today\n-\n\n Get the current date.")},
+    {"totimestamp", Date_totimestamp, METH_NOARGS, PyDoc_STR("totimetamp\n-\n\n Get the current timestamp.")},
+    {NULL, NULL}
+};
 
 PyDoc_STRVAR(doc_date, 
 "Date\n-\n\n\
@@ -49,6 +58,7 @@ static PyTypeObject Date_type = {
     .tp_init = Date_init,
     .tp_new = Date_new,
     .tp_richcompare = (richcmpfunc)Date_richcompare,
+    .tp_methods = date_methods,
     .tp_free = PyObject_Del
 };
 
