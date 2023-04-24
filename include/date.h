@@ -16,7 +16,11 @@ static PyTypeObject Date_type;
 typedef struct {
     PyObject_HEAD
 
-    long long timestamp;
+    PyObject* year;                 // year
+
+    PyObject* month;                // month
+
+    PyObject* day;                  // day
 
 } Date;
 
@@ -32,17 +36,26 @@ PyObject* Date_richcompare(PyObject* self, PyObject* other, int op);     // __lt
 
 PyObject* Date_today(PyObject* self, PyObject* Py_UNUSED(args));
 
-PyObject* Date_totimestamp(PyObject* self, PyObject* Py_UNUSED(args));
+PyObject* Date_strftime(PyObject* self, PyObject* args, PyObject* kwds);
+
+PyObject* Date_fromtimestamp(PyObject* self, PyObject* args, PyObject* kwds);
+
+static PyMemberDef date_members[] = {
+    {"year", T_OBJECT_EX, offsetof(Date, year), 0, PyDoc_STR("year")},
+    {"month", T_OBJECT_EX, offsetof(Date, month), 0, PyDoc_STR("month")},
+    {"day", T_OBJECT_EX, offsetof(Date, day), 0, PyDoc_STR("day")}
+};
 
 static PyMethodDef date_methods[] = {
     {"today", Date_today, METH_NOARGS | METH_CLASS, PyDoc_STR("today\n-\n\n Get the current date.")},
-    {"totimestamp", Date_totimestamp, METH_NOARGS, PyDoc_STR("totimetamp\n-\n\n Get the current timestamp.")},
+    {"strftime", Date_strftime, METH_VARARGS | METH_KEYWORDS, PyDoc_STR("strftime\n-\n\n Format the given date.")},
+    {"fromtimestamp", Date_fromtimestamp, METH_VARARGS | METH_KEYWORDS | METH_CLASS, PyDoc_STR("fromtimestamp\n-\n\n Get the date from float-type timestamp")},
     {NULL, NULL}
 };
 
 PyDoc_STRVAR(doc_date, 
-"Date\n-\n\n\
-The Date implementation for datetimecpy");
+"date\n-\n\n\
+The date implementation for datetimecpy");
 
 static PyTypeObject Date_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -58,6 +71,7 @@ static PyTypeObject Date_type = {
     .tp_init = Date_init,
     .tp_new = Date_new,
     .tp_richcompare = (richcmpfunc)Date_richcompare,
+    .tp_members = date_members,
     .tp_methods = date_methods,
     .tp_free = PyObject_Del
 };
