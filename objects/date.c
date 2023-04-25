@@ -25,6 +25,48 @@ int _Date_timestamp2tm(time_t timestamp, struct tm* tm) {
 #endif
 }
 
+int _Date_check_year(PyObject* year) {
+    long year_long = PyLong_AsLong(year);
+    if (year_long < 1L || year_long > 9999L) {
+        return -1;
+    }
+    return 0;
+}
+
+int _Date_check_month(PyObject* month) {
+    long month_long = PyLong_AsLong(month);
+    if (month_long < 1L || month_long > 12L) {
+        return -1;
+    }
+    return 0;
+}
+
+int _Date_check_day(PyObject* day, PyObject* month, PyObject* year) {
+    long year_long = PyLong_AsLong(year);
+    long month_long = PyLong_AsLong(month);
+    long max_day = 30;
+    if (month_long == 1L || month_long == 3L || month_long == 5L || 
+        month_long == 7L || month_long == 8L || month_long == 10L || month_long == 12L) {
+            max_day = 31;
+    } else if (month_long == 2L) {
+        if (year_long % 100 == 0) {
+            max_day = 28;
+        } else if (year_long % 4 == 0 || year_long % 400 == 0) {
+            max_day = 29;
+        } else {
+            max_day = 28;
+        }
+        
+    } else {
+        max_day = 30;
+    }
+    long day_long = PyLong_AsLong(day);
+    if (day_long < 1 || day_long > max_day) {
+        return -1;
+    }
+    return 0;
+}
+
 PyObject* Date_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
     Date* self;
     self = (Date*)type->tp_alloc(type, 0);
@@ -53,7 +95,6 @@ int Date_init(PyObject* self, PyObject* args, PyObject* kwds) {
         return -2;
     }
 
-    // TODO: 检查范围
     if (year == NULL && errorn != -1) {
         year = PyLong_FromLong((long)(tm.tm_year + 1900));
     }
@@ -65,6 +106,18 @@ int Date_init(PyObject* self, PyObject* args, PyObject* kwds) {
         day = PyLong_FromLong((long)(tm.tm_mday));
     }
 
+    if (_Date_check_year(year) < 0) {
+        PyErr_SetString(PyExc_OverflowError, "The year argument must be in [1, 9999]");
+        return -3;
+    }
+    if (_Date_check_month(month) < 0) {
+        PyErr_SetString(PyExc_OverflowError, "The month argument must be in [1, 12]");
+        return -3;
+    }
+    if (_Date_check_day(day, month, year) < 0) {
+        PyErr_SetString(PyExc_OverflowError, "The day argument is overflow for given month or year");
+        return -3;
+    }
     PyObject* tmp;
 
     tmp = ((Date*)self)->year;
@@ -97,16 +150,17 @@ PyObject* Date_repr(PyObject* self) {
     return retval;
 }
 
-// TODO: 总是返回false
 PyObject* Date_richcompare(PyObject* self, PyObject* other, int op) {
-        int diff = PyObject_RichCompareBool(((Date*)self)->year, ((Date*)other)->year, op);
+    long long left = PyLong_AsLong(((Date*)self)->year) * 100 * 100 + PyLong_AsLong(((Date*)self)->month) * 100 + PyLong_AsLong(((Date*)self)->day);
+    long long right = PyLong_AsLong(((Date*)other)->year) * 100 * 100 + PyLong_AsLong(((Date*)other)->month) * 100 + PyLong_AsLong(((Date*)other)->day);
+    int diff = PyLong_AsLong(((Date*)self)->year) - PyLong_AsLong(((Date*)other)->year);
+    if (diff == 0) {
+        diff = PyLong_AsLong(((Date*)self)->month) - PyLong_AsLong(((Date*)other)->month);
         if (diff == 0) {
-            diff = PyObject_RichCompareBool(((Date*)self)->month, ((Date*)other)->month, op);
-            if (diff == 0) {
-                diff = PyObject_RichCompareBool(((Date*)self)->day, ((Date*)other)->day, op);
-            }
+            diff = PyLong_AsLong(((Date*)self)->day) - PyLong_AsLong(((Date*)other)->day);
         }
-        Py_RETURN_RICHCOMPARE(diff, 0, op);
+    }
+    Py_RETURN_RICHCOMPARE(diff, 0, op);
         
 }
 
