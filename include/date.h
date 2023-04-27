@@ -40,6 +40,8 @@ PyObject* Date_strftime(PyObject* self, PyObject* args, PyObject* kwds);
 
 PyObject* Date_fromtimestamp(PyObject* self, PyObject* args, PyObject* kwds);
 
+PyObject* Date_timetuple(PyObject* self, PyObject* Py_UNUSED(args));
+
 static PyMemberDef date_members[] = {
     {"year", T_OBJECT_EX, offsetof(Date, year), 0, PyDoc_STR("year")},
     {"month", T_OBJECT_EX, offsetof(Date, month), 0, PyDoc_STR("month")},
@@ -50,6 +52,7 @@ static PyMethodDef date_methods[] = {
     {"today", Date_today, METH_NOARGS | METH_CLASS, PyDoc_STR("today\n-\n\n Get the current date.")},
     {"strftime", Date_strftime, METH_VARARGS | METH_KEYWORDS, PyDoc_STR("strftime\n-\n\n Format the given date.")},
     {"fromtimestamp", Date_fromtimestamp, METH_VARARGS | METH_KEYWORDS | METH_CLASS, PyDoc_STR("fromtimestamp\n-\n\n Get the date from float-type timestamp")},
+    {"timetuple", Date_timetuple, METH_NOARGS, PyDoc_STR("timetuple\n-\n\n Get the tuple-like value of the current date.") },
     {NULL, NULL}
 };
 
