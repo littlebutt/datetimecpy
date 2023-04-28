@@ -181,7 +181,29 @@ PyObject* Date_today(PyObject* self, PyObject* Py_UNUSED(args)) {
     return retval;
 }
 
-// TODO: 检查额外的format
+int _Date_implemented_format(char ch) {
+    if (ch == '\0') {
+        return 1;
+    }
+    if ((ch >= 67 && ch <= 84) || (ch == 86) || (ch >= 88 && ch <= 90) ||
+        (ch == 99) || (ch >= 101 && ch <= 105) || (ch >= 107 && ch <= 108) || 
+        (ch >= 110 && ch <= 119) || (ch >= 121 &&ch <= 122)) {
+            return 0;
+        }
+    return 1;
+}
+
+int _Date_check_format(const char* fmt) {
+    char* pin = fmt;
+    char ch;
+    while ((ch = *pin++) != '\0') {
+        if (ch == '%' && !_Date_implemented_format(*pin)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 PyObject* Date_strftime(PyObject* self, PyObject* args, PyObject* kwds) {
     PyObject* format; // Unicode类型的str
     static char* keywords[] = {"format", NULL};
@@ -204,6 +226,10 @@ PyObject* Date_strftime(PyObject* self, PyObject* args, PyObject* kwds) {
         return NULL;
     // 将Python的字符串str转换为C的char*
     fmt = PyBytes_AS_STRING(format_ascii);
+    if (_Date_check_format(fmt) == 0) {
+        PyErr_SetString(PyExc_ValueError, "The poor format");
+        return NULL;
+    }
 
     memset((void*)&tm, '\0', sizeof(struct tm));
     tm.tm_year = (int)PyLong_AsUnsignedLong(((Date*)self)->year) - 1900;
