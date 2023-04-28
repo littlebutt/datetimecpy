@@ -49,9 +49,11 @@ int _Date_check_day(PyObject* day, PyObject* month, PyObject* year) {
         month_long == 7L || month_long == 8L || month_long == 10L || month_long == 12L) {
             max_day = 31;
     } else if (month_long == 2L) {
-        if (year_long % 100 == 0) {
+        if (year_long % 400 == 0) {
+            max_day = 29;
+        } else if (year_long % 100 == 0) {
             max_day = 28;
-        } else if (year_long % 4 == 0 || year_long % 400 == 0) {
+        } else if (year_long % 4 == 0) {
             max_day = 29;
         } else {
             max_day = 28;
@@ -285,5 +287,70 @@ PyObject* Date_fromtimestamp(PyObject* self, PyObject* args, PyObject* kwds) {
     retval->month = PyLong_FromLong((long)(tm.tm_mon + 1));
     retval->day = PyLong_FromLong((long)(tm.tm_mday));
     return (PyObject*)retval;
+}
+
+int _Date_get_wday(long year, long month, long day) {
+    if (month < 3) {
+        year -= 1;
+        month += 12;
+    }
+    int c = (int)(year / 100), y = year - 100 * c;
+    int w = (int)(c / 4) - 2 * c + y + (int)(y / 4) + (26 * (month + 1) / 10) + day - 1;
+    w = (w % 7 + 7) % 7;
+    return (w + 6) % 7;
+}
+
+int _Date_get_yday(long year, long month, long day) {
+    switch (month) {
+        case 12:
+            day += 30;
+        case 11:
+            day += 31;
+        case 10:
+            day += 30;
+        case 9:
+            day += 31;
+        case 8:
+            day += 31;
+        case 7:
+            day += 30;
+        case 6:
+            day += 31;
+        case 5:
+            day += 30;
+        case 4:
+            day += 31;
+        case 3:
+            day += 28;
+            if (year % 400 == 0) {
+                day ++;
+            } else if (year % 100 == 0) {
+                // do nothing
+            } else if (year % 4 == 0) {
+                day ++;
+            }
+        case 2:
+            day += 31;
+    }
+    return day;
+}
+
+PyObject* Date_timetuple(PyObject* self, PyObject* Py_UNUSED(args)) {
+    PyObject* retval = PyTuple_New(9);
+    PyTuple_SetItem(retval, 0, ((Date*)self)->year);
+    PyTuple_SetItem(retval, 1, ((Date*)self)->month);
+    PyTuple_SetItem(retval, 2, ((Date*)self)->day);
+    PyTuple_SetItem(retval, 3, PyLong_FromLong(0L));
+    PyTuple_SetItem(retval, 4, PyLong_FromLong(0L));
+    PyTuple_SetItem(retval, 5, PyLong_FromLong(0L));
+    PyTuple_SetItem(retval, 6, PyLong_FromLong((long)_Date_get_wday(PyLong_AsLong(((Date*)self)->year), 
+                                                                    PyLong_AsLong(((Date*)self)->month), 
+                                                                    PyLong_AsLong(((Date*)self)->day))));
+    PyTuple_SetItem(retval, 7, PyLong_FromLong((long)_Date_get_yday(PyLong_AsLong(((Date*)self)->year), 
+                                                                    PyLong_AsLong(((Date*)self)->month), 
+                                                                    PyLong_AsLong(((Date*)self)->day))));
+    PyTuple_SetItem(retval, 8, PyLong_FromLong(-1L));
+    return retval;
+
 }
 
