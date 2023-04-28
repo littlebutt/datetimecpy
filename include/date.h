@@ -43,7 +43,8 @@ PyObject* Date_fromtimestamp(PyObject* self, PyObject* args, PyObject* kwds);
 static PyMemberDef date_members[] = {
     {"year", T_OBJECT_EX, offsetof(Date, year), 0, PyDoc_STR("year")},
     {"month", T_OBJECT_EX, offsetof(Date, month), 0, PyDoc_STR("month")},
-    {"day", T_OBJECT_EX, offsetof(Date, day), 0, PyDoc_STR("day")}
+    {"day", T_OBJECT_EX, offsetof(Date, day), 0, PyDoc_STR("day")},
+    {NULL}
 };
 
 static PyMethodDef date_methods[] = {
