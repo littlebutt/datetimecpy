@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include "include/date.h"
+#include "include/time.h"
 
 PyDoc_STRVAR(datetimecpy_doc, "The datetimecpy module");
 
@@ -35,6 +36,16 @@ PyMODINIT_FUNC PyInit_datetimecpy() {
         Py_DECREF(&Date_type);
         Py_DECREF(m);
         return NULL;
+    }
+    PyObject* time_mod = PyModule_Create(&time_def);
+    if (time_mod != NULL) {
+        Py_INCREF(time_mod);
+        if (PyModule_AddObject(m, "time", time_mod) < 0) {
+            Py_DECREF(time_mod);
+            Py_DECREF(&Date_type);
+            Py_DECREF(m);
+            return NULL;
+        }
     }
     return m;
 }
