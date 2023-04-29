@@ -21,6 +21,9 @@
     <ClCompile Include="..\objects\date.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\objects\time.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\date.h">
