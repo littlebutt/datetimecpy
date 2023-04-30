@@ -1,13 +1,11 @@
 #include "../include/timedelta.h"
 
-struct timedelta_buf* timedelta_buf_new(long days, long seconds, long microseconds) {
-    struct timedelta_buf* td_buf = (struct timedelta_buf*)PyMem_RawMalloc(3 * sizeof(char) * 4);
+struct timedelta_buf* timedelta_buf_new() {
+    struct timedelta_buf* td_buf = (struct timedelta_buf*)PyMem_RawMalloc(10 * sizeof(char));
     if (td_buf == NULL) {
         return NULL;
     }
-    memset(td_buf->buf, days, 4 * sizeof(char));
-    memset(td_buf->buf + 4, seconds, 4 * sizeof(char));
-    memset(td_buf->buf + 8, microseconds, 4 * sizeof(char));
+    memset(td_buf->buf, '\0', 10 * sizeof(char));
     return td_buf;
 }
 
@@ -23,20 +21,21 @@ long timedelta_buf_get_days(struct timedelta_buf* td_buf) {
 }
 
 long timedelta_buf_get_seconds(struct timedelta_buf* td_buf) {
-    return (long)(td_buf->buf[4] << 24 | td_buf->buf[5] << 16 | td_buf->buf[6] << 8 | td_buf->buf[7]);
+    return (long)(td_buf->buf[4] << 16 | td_buf->buf[5] << 8 | td_buf->buf[6]);
 }
 
 long timedelta_buf_get_microseconds(struct timedelta_buf* td_buf) {
-    return (long)(td_buf->buf[8] << 24 | td_buf->buf[9] << 16 | td_buf->buf[10] << 8 | td_buf->buf[11]);
+    return (long)(td_buf->buf[7] << 16 | td_buf->buf[8] << 8 | td_buf->buf[9]);
 }
 
 int timedelta_buf_set_days(struct timedelta_buf* td_buf, long days) {
     if (td_buf == NULL) {
         return -1;
     }
-    // TODO: 不要用memset，通过位移计算写入对应的字节 
-    // https://github.com/python/cpython/blob/accb417c338630ac6e836a5c811a89d54a3cd1d3/Modules/_datetimemodule.c#LL93C11-L93C11
-    memset(td_buf->buf, days, 4 * sizeof(char));
+    td_buf->buf[0] = (days & 0xff000000) >> 24;
+    td_buf->buf[1] = (days & 0x00ff0000) >> 16;
+    td_buf->buf[2] = (days & 0x0000ff00) >> 8;
+    td_buf->buf[3] = days & 0x000000ff;
     return 0;
 }
 
@@ -44,7 +43,9 @@ int timedelta_buf_set_seconds(struct timedelta_buf* td_buf, long seconds) {
     if (td_buf == NULL) {
         return -1;
     }
-    memset(td_buf->buf + 4, seconds, 4 * sizeof(char));
+    td_buf->buf[4] = (seconds & 0xff000000) >> 16;
+    td_buf->buf[5] = (seconds & 0x00ff0000) >> 8;
+    td_buf->buf[6] = (seconds & 0x0000ff00) >> 0;
     return 0;
 }
 
@@ -52,7 +53,9 @@ int timedelta_buf_set_microseconds(struct timedelta_buf* td_buf, long microsecon
     if (td_buf == NULL) {
         return -1;
     }
-    memset(td_buf->buf + 8, microseconds, 4 * sizeof(char));
+    td_buf->buf[7] = (microseconds & 0xff000000) >> 16;
+    td_buf->buf[8] = (microseconds & 0x00ff0000) >> 8;
+    td_buf->buf[9] = (microseconds & 0x0000ff00) >> 0;
     return 0;
 }
 
@@ -64,7 +67,7 @@ void TimedeltaExporter_dealloc(PyObject* self) {
 int TimedeltaExporter_getbuffer(TimedeltaExporter* exporter, Py_buffer* view, int flag) {
     struct timedelta_buf* buf = (struct timedelta_buf*)exporter->timedelta;
     if (buf == NULL || exporter->exports == 0) {
-        buf = timedelta_buf_new(0, 0, 0);
+        buf = timedelta_buf_new();
         if (buf == NULL) {
             return -1;
         }
