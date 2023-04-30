@@ -194,6 +194,7 @@
     <ClCompile Include="..\datetimecpy.c" />
     <ClCompile Include="..\objects\date.c" />
     <ClCompile Include="..\objects\time.c" />
+    <ClCompile Include="..\objects\timedelta.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\date.h" />

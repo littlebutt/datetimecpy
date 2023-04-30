@@ -28,10 +28,18 @@ long timedelta_buf_get_seconds(struct timedelta_buf* td_buf);
 
 long timedelta_buf_get_microseconds(struct timedelta_buf* td_buf);
 
+int timedelta_buf_set_days(struct timedelta_buf* td_buf, long days);
+
+int timedelta_buf_set_seconds(struct timedelta_buf* td_buf, long seconds);
+
+int timedelta_buf_set_microseconds(struct timedelta_buf* td_buf, long microseconds);
+
 typedef struct {
     PyObject_HEAD
 
     struct timedelta_buf* timedelta;
+
+    Py_ssize_t exports;
 
 } TimedeltaExporter;
 
@@ -67,6 +75,26 @@ void Timedelta_dealloc(PyObject* self);                                       //
 int Timedelta_init(PyObject* self, PyObject* args, PyObject* kwds);           // __init__ method
 
 PyObject* Timedelta_repr(PyObject* self);                                     // __repr__ method
+
+PyDoc_STRVAR(doc_timedelta, 
+"timedelta\n-\n\n\
+The timedelta implementation for datetimecpy");
+
+static PyTypeObject Timedelta_type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "datetimecpy.timedelta",
+    .tp_basicsize = sizeof(Timedelta),
+    .tp_dealloc = (destructor)Timedelta_dealloc,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_init = Timedelta_init,
+    .tp_repr = (reprfunc) Timedelta_repr,
+    .tp_str = (reprfunc) Timedelta_repr,
+    .tp_getattro = (getattrofunc) PyObject_GenericGetAttr,
+    .tp_setattro = (setattrofunc) PyObject_GenericSetAttr,
+    .tp_new = PyType_GenericNew,
+    .tp_doc = doc_timedelta,
+    .tp_free = PyObject_Del
+};
 
 #ifdef __cplusplus
 }
