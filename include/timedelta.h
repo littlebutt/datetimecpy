@@ -37,9 +37,23 @@ typedef struct {
 
 void TimedeltaExporter_dealloc(PyObject* self);                                       // destruction method
 
-PyObject* TimedeltaExporter_new(PyTypeObject* type, PyObject* args, PyObject* kwds);  // __new__ method
+int TimedeltaExporter_getbuffer(TimedeltaExporter* exporter, Py_buffer* view, int flag);
 
-int TimedeltaExporter_init(PyObject* self, PyObject* args, PyObject* kwds);           // __init__ method
+void TimedeltaExporter_releasebuffer(TimedeltaExporter* exporter, Py_buffer* view);
+
+static PyBufferProcs TimedeltaExporter_as_buffer = {
+    (getbufferproc) TimedeltaExporter_getbuffer,
+    (releasebufferproc) TimedeltaExporter_releasebuffer
+};
+
+static PyTypeObject TimedeltaExporter_type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "datetimecpy._timedelta_exporter",
+    .tp_basicsize = sizeof(TimedeltaExporter),
+    .tp_dealloc = (destructor) TimedeltaExporter_dealloc,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_as_buffer = &TimedeltaExporter_as_buffer
+};
 
 typedef struct {
     PyObject_HEAD
@@ -49,8 +63,6 @@ typedef struct {
 } Timedelta;
 
 void Timedelta_dealloc(PyObject* self);                                       // destruction method
-
-PyObject* Timedelta_new(PyTypeObject* type, PyObject* args, PyObject* kwds);  // __new__ method
 
 int Timedelta_init(PyObject* self, PyObject* args, PyObject* kwds);           // __init__ method
 

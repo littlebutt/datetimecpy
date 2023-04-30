@@ -26,3 +26,9 @@ long timedelta_buf_get_seconds(struct timedelta_buf* td_buf) {
 long timedelta_buf_get_microseconds(struct timedelta_buf* td_buf) {
     return (long)(td_buf->buf[8] << 24 | td_buf->buf[9] << 16 | td_buf->buf[10] << 8 | td_buf->buf[11]);
 }
+
+void TimedeltaExporter_dealloc(PyObject* self) {
+    timedelta_buf_delete(((TimedeltaExporter*)self)->timedelta);
+    Py_TYPE(self)->tp_free(self);
+}
+
