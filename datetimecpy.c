@@ -4,6 +4,7 @@
 #include <time.h>
 #include "include/date.h"
 #include "include/time.h"
+#include "include/timedelta.h"
 
 PyDoc_STRVAR(datetimecpy_doc, "The datetimecpy module");
 
@@ -21,6 +22,12 @@ static PyModuleDef datetimecpy_def = {
 
 PyMODINIT_FUNC PyInit_datetimecpy() {
     if (PyType_Ready(&Date_type) < 0) {
+        return NULL;
+    }
+    if (PyType_Ready(&TimedeltaExporter_type) < 0) {
+        return NULL;
+    }
+    if (PyType_Ready(&Timedelta_type) < 0) {
         return NULL;
     }
     PyObject* m = PyModule_Create(&datetimecpy_def);
@@ -46,6 +53,25 @@ PyMODINIT_FUNC PyInit_datetimecpy() {
             Py_DECREF(m);
             return NULL;
         }
+    }
+    Py_INCREF(&TimedeltaExporter_type);
+    if (PyModule_AddObject(m, "_timedelta_exporter", (PyObject*)&TimedeltaExporter_type) < 0)
+    {
+        Py_DECREF(&TimedeltaExporter_type);
+        Py_DECREF(time_mod);
+        Py_DECREF(&Date_type);
+        Py_DECREF(m);
+        return NULL;
+    }
+    Py_INCREF(&Timedelta_type);
+    if (PyModule_AddObject(m, "timedelta", (PyObject*)&Timedelta_type) < 0)
+    {
+        Py_DECREF(&Timedelta_type);
+        Py_DECREF(&TimedeltaExporter_type);
+        Py_DECREF(time_mod);
+        Py_DECREF(&Date_type);
+        Py_DECREF(m);
+        return NULL;
     }
     return m;
 }
