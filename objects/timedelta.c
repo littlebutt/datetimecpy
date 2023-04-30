@@ -35,7 +35,7 @@ int timedelta_buf_set_days(struct timedelta_buf* td_buf, long days) {
     td_buf->buf[0] = (days & 0xff000000) >> 24;
     td_buf->buf[1] = (days & 0x00ff0000) >> 16;
     td_buf->buf[2] = (days & 0x0000ff00) >> 8;
-    td_buf->buf[3] = days & 0x000000ff;
+    td_buf->buf[3] = (days & 0x000000ff) >> 0;
     return 0;
 }
 
@@ -43,9 +43,9 @@ int timedelta_buf_set_seconds(struct timedelta_buf* td_buf, long seconds) {
     if (td_buf == NULL) {
         return -1;
     }
-    td_buf->buf[4] = (seconds & 0xff000000) >> 16;
-    td_buf->buf[5] = (seconds & 0x00ff0000) >> 8;
-    td_buf->buf[6] = (seconds & 0x0000ff00) >> 0;
+    td_buf->buf[4] = (seconds & 0x00ff0000) >> 16;
+    td_buf->buf[5] = (seconds & 0x0000ff00) >> 8;
+    td_buf->buf[6] = (seconds & 0x000000ff) >> 0;
     return 0;
 }
 
@@ -53,9 +53,9 @@ int timedelta_buf_set_microseconds(struct timedelta_buf* td_buf, long microsecon
     if (td_buf == NULL) {
         return -1;
     }
-    td_buf->buf[7] = (microseconds & 0xff000000) >> 16;
-    td_buf->buf[8] = (microseconds & 0x00ff0000) >> 8;
-    td_buf->buf[9] = (microseconds & 0x0000ff00) >> 0;
+    td_buf->buf[7] = (microseconds & 0x00ff0000) >> 16;
+    td_buf->buf[8] = (microseconds & 0x0000ff00) >> 8;
+    td_buf->buf[9] = (microseconds & 0x000000ff) >> 0;
     return 0;
 }
 
